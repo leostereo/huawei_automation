@@ -99,7 +99,7 @@
 	},	
            save: function (event) {
              axios
-             .get('http://localhost:3000/save?ip='+this.ip)
+             .get('http://localhost:3000/save?ip='+this.ip2)
              .then(response => (this.save_result = response.status))
            },
            get_sn: function (event) {
@@ -130,8 +130,15 @@
            restore: function (event){
                 this.ip=null;
                 this.sn.data=null;
+                this.sn.status=null,
                 this.client_name.data=null;
+                this.client_name.status=null;
                 this.upload_result=null;
+                this.rem_smart_result = null,
+                this.ip2=null,
+                this.uid=null,
+                this.save_result.status=null,
+                this.set_userid_result=null
            }
          }
          });

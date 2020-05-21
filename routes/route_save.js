@@ -11,7 +11,7 @@ module.exports = function(app) {
         (async () => {
             const browser = await puppeteer.launch({
                 headless: false,
-                devtools: true,
+                devtools: false,
                 ignoreHTTPSErrors: true
             });
             const page = await browser.newPage();
@@ -21,7 +21,8 @@ module.exports = function(app) {
                 console.log("result :" + message);
                 if (message === 'Configuration file saved successfully.') {
                     res.sendStatus(200);
-		    await browser.close();
+                    await waitFor(2000);
+		            await browser.close();
                 } else {
                     res.sendStatus(500);
 		    await browser.close();

@@ -48,8 +48,8 @@ module.exports = function(app) {
 
 
                 await page.waitForSelector('#txt_Username');
-                await page.type('#txt_Username', 'adminwiber')
-                await page.type('#txt_Password', 'wiberpass123')
+                await page.type('#txt_Username', 'telecomadmin')
+                await page.type('#txt_Password', 'admintelecom')
                 await page.click('[name="Submit"]')
                 await page.waitForNavigation()
                 await page.waitForSelector('[name="maindiv_waninfo"]');

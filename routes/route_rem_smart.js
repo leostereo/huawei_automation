@@ -27,7 +27,7 @@ module.exports = function(app) {
             .catch(function(error) {
 		console.log('###########################');
                 //console.log(error);
-                res.status(200).send('la onu  no se encuentra');
+                res.status(200).send('onu borrada');
             })
 
 
