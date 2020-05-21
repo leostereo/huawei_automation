@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <title> Vue.js </title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+   </head>
+   <body>
+      <div id="app" class="container">
+         <h1> huawei </h1>
+
+	<div id="save">
+	 <label for="ip">ip</label>
+         <input name="ip" v-model="ip" placeholder=""><br><br>
+    </div>
+	<div id="sn">
+         <button v-on:click="get_sn">ver serial</button>
+         <span>Result: {{ sn.status }}</span>
+	</div>
+	<br>
+	<div id="client_name">
+	 <label for="serial">serial</label>
+         <input name="serial" v-model="sn.data" placeholder=""><br><br>
+         <button v-on:click="get_name">ver cliente</button>
+         <span>Result: {{ client_name.status }}</span><br><br>
+	 <label for="name">nombre</label>
+         <input name="name" v-model="client_name.data" size="40" placeholder=""><br><br>
+    </div>
+    
+    <div id="upload">
+        <button v-on:click="upload">subir config</button>
+        <span>Result: {{ upload_result }}</span>
+    </div>
+    <br>
+    <div id="rem_smart">
+        <button v-on:click="rem_smart">Borrar de smart</button>
+        <span>Result: {{ rem_smart_result }}</span>
+   </div><br>
+
+    <div id="userid">
+	<label for="ip2">ip</label>
+        <input name="ip2" v-model="ip2" placeholder=""><br><br>
+	<label for="uid">User ID</label>
+        <input name="uid" v-model="uid" placeholder=""><br><br>
+        <button v-on:click="set_userid">Cargar UserId</button>
+        <span>Result: {{ set_userid_result }}</span>
+   </div>
+
+    <br>
+    <div id="restore">
+        <button v-on:click="restore">Restaurar</button>
+        <button v-on:click="save">guardar config</button>
+        <span>Result: {{ save_result }}</span>
+        <button v-on:click="todo">ver TODO</button>
+    </div>
+
+	<div v-if="show_todo">
+	<dialog open>
+ 	  <ul>
+  		<li>formatear</li>
+  		<li>confirmar estado de salidad de todas las operaciones</li>
+  		<li>Agregar indicador de carga</li>
+  		<li>generar linea de control</li>
+	  </ul> 
+	</dialog>
+	</div>
+
+
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <script>
+         Vue.config.devtools = true
+         new Vue({
+         	el: '#app',
+         	data: {
+	show_todo:false,
+        ip:null,
+        ip2:null,        
+		save_result:null,
+			sn:{
+				status:null,
+				data:null
+			},
+			client_name:{
+				status:null,
+				data:null
+            },
+        upload_result:null,
+        rem_smart_result:null,
+	uid:null,
+        set_userid_result:null,
+         	},
+	methods: {
+         
+	todo: function (event){
+		this.show_todo = true;
+	},	
+           save: function (event) {
+             axios
+             .get('http://localhost:3000/save?ip='+this.ip)
+             .then(response => (this.save_result = response.status))
+           },
+           get_sn: function (event) {
+             axios
+             .get('http://localhost:3000/get_sn?ip='+this.ip)
+             .then(response => (this.sn = response))
+           },
+           get_name: function (event) {
+	     axios
+             .get('http://localhost:3000/get_name?sn='+this.sn.data)
+             .then(response => (this.client_name = response))
+           },
+           upload: function (event) {
+	     axios
+             .get('http://localhost:3000/upload?ip='+this.ip)
+             .then(response => (this.upload_result = response.data))
+           },
+           set_userid: function (event) {
+	     axios
+             .get('http://localhost:3000/set_userid?ip='+this.ip2+'&uid='+this.uid)
+             .then(response => (this.set_userid_result = response.status))
+           },    
+           rem_smart: function (event) {
+	     axios
+             .get('http://localhost:3000/rem_smart?sn='+this.sn.data)
+             .then(response => (this.rem_smart_result = response.data))
+           },                  
+           restore: function (event){
+                this.ip=null;
+                this.sn.data=null;
+                this.client_name.data=null;
+                this.upload_result=null;
+           }
+         }
+         });
+         
+      </script>
+   </body>
+</html>
+
