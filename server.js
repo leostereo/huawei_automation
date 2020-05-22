@@ -11,6 +11,9 @@ var routes = require('./routes/route_rem_smart')(app); //This is the extra line
 var routes = require('./routes/route_upload')(app); //This is the extra line
 var routes = require('./routes/route_set_userid')(app); //This is the extra line
 
+app.use('/images', express.static(__dirname + '/images'));
+
+
 app.listen(3000, () => {
  console.log("El servidor está inicializado en el puerto 3000");
 });

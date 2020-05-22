@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
    <head>
@@ -8,65 +7,70 @@
    </head>
    <body>
       <div id="app" class="container">
-         <h1> huawei </h1>
-
-	<div id="save">
-	 <label for="ip">ip</label>
-         <input name="ip" v-model="ip" placeholder=""><br><br>
-    </div>
-	<div id="sn">
-         <button v-on:click="get_sn">ver serial</button>
-         <span>Result: {{ sn.status }}</span>
+	<div id="nav_bar">
+          <span id="title">huawei config tool</span>
+	<img class="loader" v-if="on_process" src="images/loader.gif">
 	</div>
-	<br>
-	<div id="client_name">
-	 <label for="serial">serial</label>
-         <input name="serial" v-model="sn.data" placeholder=""><br><br>
-         <button v-on:click="get_name">ver cliente</button>
-         <span>Result: {{ client_name.status }}</span><br><br>
-	 <label for="name">nombre</label>
-         <input name="name" v-model="client_name.data" size="40" placeholder=""><br><br>
-    </div>
-    
-    <div id="upload">
-        <button v-on:click="upload">subir config</button>
-        <span>Result: {{ upload_result }}</span>
-    </div>
-    <br>
-    <div id="rem_smart">
-        <button v-on:click="rem_smart">Borrar de smart</button>
-        <span>Result: {{ rem_smart_result }}</span>
-   </div><br>
-
-    <div id="userid">
-	<label for="ip2">ip</label>
-        <input name="ip2" v-model="ip2" placeholder=""><br><br>
-	<label for="uid">User ID</label>
-        <input name="uid" v-model="uid" placeholder=""><br><br>
-        <button v-on:click="set_userid">Cargar UserId</button>
-        <span>Result: {{ set_userid_result }}</span>
-   </div>
-
-    <br>
-    <div id="restore">
-        <button v-on:click="restore">Restaurar</button>
-        <button v-on:click="save">guardar config</button>
-        <span>Result: {{ save_result }}</span>
-        <button v-on:click="todo">ver TODO</button>
-    </div>
-
-	<div v-if="show_todo">
-	<dialog open>
- 	  <ul>
-  		<li>formatear</li>
-  		<li>confirmar estado de salidad de todas las operaciones</li>
-  		<li>Agregar indicador de carga</li>
-  		<li>generar linea de control</li>
-	  </ul> 
-	</dialog>
+         <div id="sn" class="process" v-bind:class="{ 'completed': sn.status }">
+            <label for="ip">ip</label>
+            <input name="ip" v-model="ip" size="15" placeholder="">
+            <button v-on:click="get_sn">ver serial</button>
+            <span hidden>Result: {{ sn.status }}</span>
+            <label for="serial">serial</label>
+            <input name="serial" v-model="sn.data" placeholder="">
+         </div>
+         <div id="client_name" class="process" v-bind:class="{ 'completed': client_name.status }">
+            <button v-on:click="get_name">ver cliente</button>
+            <span hidden>Result: {{ client_name.status }}</span>
+            <label for="name">nombre</label>
+            <input name="name" v-model="client_name.data" size="60" placeholder="">
+         </div>
+         <div id="datos_isp" class="process">
+            <label for="name">nombre</label>
+            <input name="name" size="60" v-model="isp.name">
+            <label for="date">fecha</label>
+            <input name="date" size="10" v-model="isp.date">
+            <label for="profile">plan</label>
+            <input name="profile" size="15" v-model="isp.profile">
+         </div>
+         <div id="upload" class="process" v-bind:class="{ 'completed': upload_result }">
+            <button v-on:click="upload">subir config</button>
+            <span hidden>Result: {{ upload_result }}</span>
+         </div>
+         <div id="rem_smart" class="process" v-bind:class="{ 'completed': rem_smart_result }">
+            <button v-on:click="rem_smart">Borrar de smart</button>
+            <span hidden>Result: {{ rem_smart_result }}</span>
+         </div>
+         <div id="userid" class="process" v-bind:class="{ 'completed': set_userid_result }">
+            <label for="ip2">ip</label>
+            <input name="ip2" v-model="ip2" placeholder="">
+            <label for="uid">User ID</label>
+            <input name="uid" v-model="uid" placeholder="">
+            <button v-on:click="set_userid">Cargar UserId</button>
+            <span hidden>Result: {{ set_userid_result }}</span>
+         </div>
+         <div id="save" class="process" v-bind:class="{ 'completed': save_result }">
+            <button v-on:click="save">guardar config</button>
+            <span hidden>Result: {{ save_result }}</span>
+         </div>
+         <div id="restore" class="process">
+            <button v-on:click="restore">Restaurar</button>
+            <button v-on:click="add_log">Agregar registro</button>
+            <button v-on:click="todo">ver TODO</button>
+         </div>
+	<div id="logs">
+	<textarea id="logs_area" rows="4" cols="80"></textarea>
 	</div>
-
-
+         <div v-if="show_todo">
+            <dialog open>
+               <ul>
+                  <li>formatear</li>
+                  <li>confirmar estado de salidad de todas las operaciones</li>
+                  <li>Agregar indicador de carga</li>
+                  <li>generar linea de control</li>
+               </ul>
+            </dialog>
+         </div>
       </div>
       <script src="https://cdn.jsdelivr.net/npm/vue"></script>
       <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -75,75 +79,109 @@
          new Vue({
          	el: '#app',
          	data: {
-	show_todo:false,
-        ip:null,
-        ip2:null,        
-		save_result:null,
-			sn:{
-				status:null,
-				data:null
-			},
-			client_name:{
-				status:null,
-				data:null
+	on_process:false,
+         show_todo:false,
+         ip:null,
+         ip2:null,        
+         save_result:null,
+         sn:{
+         status:null,
+         data:null
+         },
+         client_name:{
+         status:null,
+         data:null
             },
-        upload_result:null,
-        rem_smart_result:null,
-	uid:null,
-        set_userid_result:null,
+	 isp:{
+		name:null,
+		date:null,
+		profile:null
+	},
+         upload_result:null,
+         rem_smart_result:null,
+         uid:null,
+         set_userid_result:null,
          	},
-	methods: {
+         methods: {
          
-	todo: function (event){
-		this.show_todo = true;
-	},	
+         todo: function (event){
+         this.show_todo = true;
+         },	
            save: function (event) {
+	   this.on_process=true;
              axios
              .get('http://localhost:3000/save?ip='+this.ip2)
              .then(response => (this.save_result = response.status))
+	   this.on_process=false;
            },
            get_sn: function (event) {
+		this.on_process=true;
              axios
              .get('http://localhost:3000/get_sn?ip='+this.ip)
-             .then(response => (this.sn = response))
+             .then(response => (this.sn = response, this.on_process=false));
+		
            },
            get_name: function (event) {
-	     axios
+         axios
              .get('http://localhost:3000/get_name?sn='+this.sn.data)
              .then(response => (this.client_name = response))
            },
            upload: function (event) {
-	     axios
+         axios
              .get('http://localhost:3000/upload?ip='+this.ip)
              .then(response => (this.upload_result = response.data))
            },
            set_userid: function (event) {
-	     axios
+         axios
              .get('http://localhost:3000/set_userid?ip='+this.ip2+'&uid='+this.uid)
              .then(response => (this.set_userid_result = response.status))
            },    
            rem_smart: function (event) {
-	     axios
+         axios
              .get('http://localhost:3000/rem_smart?sn='+this.sn.data)
              .then(response => (this.rem_smart_result = response.data))
-           },                  
+           },
+		add_log: function (event) {
+			var line_log = this.ip+','+this.sn.data+','+this.isp.name+','+this.isp.date+
+			','+this.isp.profile+','+this.uid;
+			document.getElementById("logs_area").value += line_log+"\n";	
+		},                  
            restore: function (event){
                 this.ip=null;
-                this.sn.data=null;
-                this.sn.status=null,
+                this.sn={},
                 this.client_name.data=null;
                 this.client_name.status=null;
                 this.upload_result=null;
                 this.rem_smart_result = null,
                 this.ip2=null,
                 this.uid=null,
-                this.save_result.status=null,
-                this.set_userid_result=null
+                this.save_result=null,
+                this.set_userid_result=null,
+		this.isp={}
            }
          }
          });
          
       </script>
+	<style>
+		.process{
+			margin-bottom:2px;
+			border: 2px solid black;
+			border-radius: 25px;
+			padding-top:1%;
+			padding-left:2%;
+			padding-bottom:1%;
+			width: 75%;
+		}
+		.completed{
+			background-color: #28a745;
+		}
+img.loader{
+  width: 80px;
+  height: auto;
+}	
+	</style>
+
    </body>
 </html>
 
