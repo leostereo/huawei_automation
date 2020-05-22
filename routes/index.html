@@ -25,13 +25,14 @@
             <label for="name">nombre</label>
             <input name="name" v-model="client_name.data" size="60" placeholder="">
          </div>
-         <div id="datos_isp" class="process">
+         <div id="datos_isp" class="process" v-bind:class="{ 'completed': isp_completed }">
             <label for="name">nombre</label>
-            <input name="name" size="60" v-model="isp.name">
+            <input id="nametxt" name="name" size="50" v-model="client_name.data"><button v-on:click="cp_clipboard">Copiar</button>
+            <br><br>
             <label for="date">fecha</label>
             <input name="date" size="10" v-model="isp.date">
             <label for="profile">plan</label>
-            <input name="profile" size="15" v-model="isp.profile">
+            <input name="profile" size="35" @change="set_isp_class" v-model="isp.profile">
          </div>
          <div id="upload" class="process" v-bind:class="{ 'completed': upload_result }">
             <button v-on:click="upload">subir config</button>
@@ -59,7 +60,7 @@
             <button v-on:click="todo">ver TODO</button>
          </div>
 	<div id="logs">
-	<textarea id="logs_area" rows="4" cols="80"></textarea>
+	<textarea id="logs_area" rows="4" cols="110"></textarea>
 	</div>
          <div v-if="show_todo">
             <dialog open>
@@ -80,9 +81,10 @@
          	el: '#app',
          	data: {
 	on_process:false,
+         isp_completed:null,
          show_todo:false,
          ip:null,
-         ip2:null,        
+         ip2:"10.22.",        
          save_result:null,
          sn:{
          status:null,
@@ -111,7 +113,7 @@
 	   this.on_process=true;
              axios
              .get('http://localhost:3000/save?ip='+this.ip2)
-             .then(response => (this.save_result = response.status))
+             .then(response => (this.save_result = response.status, this.on_process=false))
 	   this.on_process=false;
            },
            get_sn: function (event) {
@@ -122,30 +124,49 @@
 		
            },
            get_name: function (event) {
+         this.on_process=true;
          axios
              .get('http://localhost:3000/get_name?sn='+this.sn.data)
-             .then(response => (this.client_name = response))
+             .then(response => (this.client_name = response, this.on_process=false))
            },
            upload: function (event) {
+         this.on_process=true;     
          axios
              .get('http://localhost:3000/upload?ip='+this.ip)
-             .then(response => (this.upload_result = response.data))
+             .then(response => (this.upload_result = response.data, this.on_process=false))
            },
            set_userid: function (event) {
+         this.on_process=true;      
          axios
              .get('http://localhost:3000/set_userid?ip='+this.ip2+'&uid='+this.uid)
-             .then(response => (this.set_userid_result = response.status))
+             .then(response => (this.set_userid_result = response.status, this.on_process=false))
            },    
            rem_smart: function (event) {
+         this.on_process=true;      
          axios
              .get('http://localhost:3000/rem_smart?sn='+this.sn.data)
-             .then(response => (this.rem_smart_result = response.data))
+             .then(response => (this.rem_smart_result = response.data, this.on_process=false))
            },
 		add_log: function (event) {
-			var line_log = this.ip+','+this.sn.data+','+this.isp.name+','+this.isp.date+
+			var line_log = this.ip+','+this.sn.data+','+this.client_name.data+','+this.isp.date+
 			','+this.isp.profile+','+this.uid;
 			document.getElementById("logs_area").value += line_log+"\n";	
-		},                  
+		},   
+      set_isp_class: function(event){
+         this.isp_completed=true;
+      },
+      cp_clipboard: function(event){
+  /* Get the text field */
+   var copyText = document.getElementById("nametxt");
+
+  /* Select the text field */
+  copyText.select();
+
+  document.execCommand("copy");
+
+  /* Alert the copied text */
+
+      },               
            restore: function (event){
                 this.ip=null;
                 this.sn={},
@@ -153,10 +174,11 @@
                 this.client_name.status=null;
                 this.upload_result=null;
                 this.rem_smart_result = null,
-                this.ip2=null,
+                this.ip2="10.22.",
                 this.uid=null,
                 this.save_result=null,
                 this.set_userid_result=null,
+                  this.isp_completed=null
 		this.isp={}
            }
          }
@@ -180,6 +202,18 @@ img.loader{
   width: 80px;
   height: auto;
 }	
+
+button {
+  background-color: #008CBA; /* Green */
+  border: none;
+  color: white;
+  padding: 2px 7px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border-radius: 8px;
+  font-size: 16px;
+}
 	</style>
 
    </body>
